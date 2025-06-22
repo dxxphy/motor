@@ -1,6 +1,7 @@
 #include "motor_mi.h"
 #include "zephyr/device.h"
 #include "zephyr/drivers/can.h"
+#include "zephyr/drivers/motor.h"
 #include "zephyr/types.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -483,10 +484,10 @@ void mi_tx_data_handler(struct k_work *work) {
     if (data->online) {
       int can_id = get_can_id(motor_devices[i]);
       if (data->missed_times > 4 && data->enabled == true) {
-        LOG_ERR("Motor %d is not responding, missed %d times, setting it "
-                "to "
-                "offline...",
-                i, data->missed_times);
+        // LOG_ERR("Motor %d is not responding, missed %d times, setting it "
+        //         "to "
+        //         "offline...",
+        //         i, data->missed_times);
 
         struct can_frame frame = {0};
         frame.flags = CAN_FRAME_IDE;
@@ -581,6 +582,9 @@ void mi_init_handler(struct k_work *work) {
   for (int i = 0; i < MOTOR_COUNT; i++) {
     mi_motor_control(motor_devices[i], ENABLE_MOTOR);
     k_sleep(K_MSEC(2));
+    mi_motor_control(motor_devices[i], SET_ZERO_OFFSET);
+    k_sleep(K_MSEC(2));
+    
   }
 
   k_timer_start(&mi_tx_timer, K_NO_WAIT, K_MSEC(2));
