@@ -253,7 +253,7 @@ static int get_motor_id(struct can_frame *frame)
 	return -1;
 }
 
-static struct can_filter filters[CONFIG_CAN_COUNT];
+static struct can_filter filters[MOTOR_COUNT];
 
 static void mi_can_rx_handler(const struct device *can_dev, struct can_frame *frame,
 			      void *user_data)
@@ -384,8 +384,8 @@ void mi_init_handler(struct k_work *work)
 
 		reg_can_dev(cfg->common.phy);
 		filters[i].flags = CAN_FILTER_IDE;
-		filters[i].mask = 0x1F0000FF;
-		filters[i].id = 0x1F000000 | (cfg->common.id & 0xFF);
+		filters[i].mask = 0x00000000;
+		filters[i].id = 0x00000000 | (cfg->common.id & 0xFF);
 		int err = can_add_rx_filter(cfg->common.phy, mi_can_rx_handler, 0, &filters[i]);
 		if (err < 0) {
 			LOG_ERR("Error adding CAN filter (err %d)", err);
